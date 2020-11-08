@@ -39,7 +39,7 @@ jobs:
         uses: garygrossgarten/github-action-scp@release
         with:
           local: build/libs/blockchain-0.0.1.jar
-          remote: ~/blockchain/payments/blockchain-0.0.1.jar
+          remote: blockchain/payments/blockchain-0.0.1.jar
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
@@ -48,7 +48,7 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            cd ~/blockchain/payments/blockchain-0.0.1.jar && kill -9 $(cat application.pid)
+            cd blockchain/payments/blockchain-0.0.1.jar && kill -9 $(cat application.pid)
           host: ${{ secrets.HOST }}
           user: ${{ secrets.SSH_USER }}
           pass: ${{ secrets.SSH_PASSWORD }}
@@ -58,7 +58,7 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            cd ~/blockchain/payments/blockchain-0.0.1.jar && java -jar blockchain-0.0.1.jar &
+            cd blockchain/payments/blockchain-0.0.1.jar && java -jar blockchain-0.0.1.jar &
           host: ${{ secrets.HOST }}
           user: ${{ secrets.SSH_USER }}
           pass: ${{ secrets.SSH_PASSWORD }}
