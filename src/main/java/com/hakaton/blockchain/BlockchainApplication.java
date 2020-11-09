@@ -10,7 +10,7 @@ public class BlockchainApplication {
     public static void main(String[] args) {
         SpringApplication springApplication = new SpringApplication(BlockchainApplication.class);
         springApplication.addListeners(new ApplicationPidFileWriter());
-        springApplication.run(args);
+        springApplication.run(args);//
     }
 
 }
