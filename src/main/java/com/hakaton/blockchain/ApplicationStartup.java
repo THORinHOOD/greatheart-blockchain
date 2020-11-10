@@ -1,7 +1,9 @@
 package com.hakaton.blockchain;
 
+import com.hakaton.blockchain.configs.MainConfiguration;
 import com.hakaton.blockchain.services.EnrollAdmin;
 import com.hakaton.blockchain.services.RegisterUser;
+import org.apache.log4j.chainsaw.Main;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
@@ -12,7 +14,6 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 
     private final EnrollAdmin enrollAdmin;
     private final RegisterUser registerUser;
-
     private boolean successStartup;
 
     public ApplicationStartup(EnrollAdmin enrollAdmin, RegisterUser registerUser) {

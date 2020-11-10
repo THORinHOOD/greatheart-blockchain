@@ -5,6 +5,7 @@ import com.hakaton.blockchain.Response;
 import com.hakaton.blockchain.controllers.dto.OperationDto;
 import com.hakaton.blockchain.controllers.models.FundWallet;
 import com.hakaton.blockchain.controllers.models.Operation;
+import com.hakaton.blockchain.services.DirectoryService;
 import com.hakaton.blockchain.services.FabricApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +16,14 @@ public class MainController {
 
     private final ApplicationStartup applicationStartup;
     private final FabricApi fabricApi;
+    private final DirectoryService directoryService;
 
     public MainController(ApplicationStartup applicationStartup,
-                          FabricApi fabricApi) {
+                          FabricApi fabricApi,
+                          DirectoryService directoryService) {
         this.applicationStartup = applicationStartup;
         this.fabricApi = fabricApi;
+        this.directoryService = directoryService;
     }
 
     @GetMapping("/startup")
@@ -38,15 +42,24 @@ public class MainController {
 
     @PostMapping("/donation")
     public ResponseEntity<Response<Operation>> addDonation(@RequestBody OperationDto request) {
-        return fabricApi
-                .addDonation(request.getUserId(), request.getAmount(), request.getTimestamp())
-                .makeResponse();
+        return Response.EXECUTE(() -> {
+            Response<Operation> response = fabricApi
+                    .addDonation(request.getUserId(), request.getAmount(), request.getTimestamp(),
+                            request.getDescription());
+            if (!response.isSuccess()) {
+                return response;
+            }
+            return directoryService
+                    .addTransactionToEntity(request.getEntityId(), response.getBody());
+        }).makeResponse();
+
     }
 
     @PostMapping("/consumption")
     public ResponseEntity<Response<Operation>> addOperation(@RequestBody OperationDto request) {
         return fabricApi
-                .addConsumption(request.getUserId(), request.getAmount(), request.getTimestamp())
+                .addConsumption(request.getUserId(), request.getAmount(), request.getTimestamp(),
+                        request.getDescription())
                 .makeResponse();
     }
 

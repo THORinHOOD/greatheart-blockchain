@@ -48,19 +48,21 @@ public class FabricApi {
                 this::parseOperation);
     }
 
-    public Response<Operation> addDonation(Long userId, Long amount, String timestamp) {
-        return addOperation(userId, amount, timestamp, "DONATION");
+    public Response<Operation> addDonation(Long userId, Long amount, String timestamp, String description) {
+        return addOperation(userId, amount, timestamp, "DONATION", description);
     }
 
-    public Response<Operation> addConsumption(Long userId, Long amount, String timestamp) {
-        return addOperation(userId, amount, timestamp, "CONSUMPTION");
+    public Response<Operation> addConsumption(Long userId, Long amount, String timestamp, String description) {
+        return addOperation(userId, amount, timestamp, "CONSUMPTION", description);
     }
 
-    private Response<Operation> addOperation(Long userId, Long amount, String timestamp, String operationType) {
+    private Response<Operation> addOperation(Long userId, Long amount, String timestamp, String operationType,
+                                             String description) {
         return executeTransaction(contract -> contract.submitTransaction(getOperationMethod(operationType),
                         String.valueOf(userId),
                         String.valueOf(amount),
-                        timestamp),
+                        timestamp,
+                        description),
                 this::parseOperation);
     }
 
@@ -83,7 +85,8 @@ public class FabricApi {
                 obj.getLong("amount"),
                 obj.getString("timestamp"),
                 obj.getString("id"),
-                obj.getString("operationType")
+                obj.getString("operationType"),
+                obj.getString("description")
         ));
     }
 
