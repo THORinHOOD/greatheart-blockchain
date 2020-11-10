@@ -56,11 +56,17 @@ public class MainController {
     }
 
     @PostMapping("/consumption")
-    public ResponseEntity<Response<Operation>> addOperation(@RequestBody OperationDto request) {
-        return fabricApi
-                .addConsumption(request.getUserId(), request.getAmount(), request.getTimestamp(),
-                        request.getDescription())
-                .makeResponse();
+    public ResponseEntity<Response<Operation>> addConsumption(@RequestBody OperationDto request) {
+        return Response.EXECUTE(() -> {
+            Response<Operation> response = fabricApi
+                    .addConsumption(request.getUserId(), request.getAmount(), request.getTimestamp(),
+                            request.getDescription());
+            if (!response.isSuccess()) {
+                return response;
+            }
+            return directoryService
+                    .addTransactionToEntity(request.getEntityId(), response.getBody());
+        }).makeResponse();
     }
 
     @GetMapping("/donation")
