@@ -3,22 +3,22 @@ package com.hakaton.blockchain.controllers.dto;
 import java.io.Serializable;
 
 public class OperationDto implements Serializable {
-    private final Long userId;
+    private final String login;
     private final Long amount;
     private final String timestamp;
     private final String description;
     private final Long entityId;
 
-    public OperationDto(Long userId, Long amount, String timestamp, String description, Long entityId) {
-        this.userId = userId;
+    public OperationDto(String login, Long amount, String timestamp, String description, Long entityId) {
+        this.login = login;
         this.amount = amount;
         this.timestamp = timestamp;
         this.description = description;
         this.entityId = entityId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getLogin() {
+        return login;
     }
 
     public Long getAmount() {

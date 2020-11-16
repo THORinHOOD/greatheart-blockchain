@@ -34,32 +34,32 @@ public class FabricApi {
         return builder.connect();
     }
 
-    public Response<Operation> readDonation(Long userId, String timestamp) {
-        return readOperation(userId, timestamp, "DONATION");
+    public Response<Operation> readDonation(String login, String timestamp) {
+        return readOperation(login, timestamp, "DONATION");
     }
 
-    public Response<Operation> readConsumption(Long userId, String timestamp) {
-        return readOperation(userId, timestamp, "CONSUMPTION");
+    public Response<Operation> readConsumption(String login, String timestamp) {
+        return readOperation(login, timestamp, "CONSUMPTION");
     }
 
-    private Response<Operation> readOperation(Long userId, String timestamp, String operationType) {
+    private Response<Operation> readOperation(String login, String timestamp, String operationType) {
         return executeTransaction(contract -> contract.evaluateTransaction("readOperation",
-                         String.valueOf(userId), timestamp, operationType),
+                         login, timestamp, operationType),
                 this::parseOperation);
     }
 
-    public Response<Operation> addDonation(Long userId, Long amount, String timestamp, String description) {
-        return addOperation(userId, amount, timestamp, "DONATION", description);
+    public Response<Operation> addDonation(String login, Long amount, String timestamp, String description) {
+        return addOperation(login, amount, timestamp, "DONATION", description);
     }
 
-    public Response<Operation> addConsumption(Long userId, Long amount, String timestamp, String description) {
-        return addOperation(userId, amount, timestamp, "CONSUMPTION", description);
+    public Response<Operation> addConsumption(String login, Long amount, String timestamp, String description) {
+        return addOperation(login, amount, timestamp, "CONSUMPTION", description);
     }
 
-    private Response<Operation> addOperation(Long userId, Long amount, String timestamp, String operationType,
+    private Response<Operation> addOperation(String login, Long amount, String timestamp, String operationType,
                                              String description) {
         return executeTransaction(contract -> contract.submitTransaction(getOperationMethod(operationType),
-                        String.valueOf(userId),
+                        login,
                         String.valueOf(amount),
                         timestamp,
                         description),
@@ -71,17 +71,13 @@ public class FabricApi {
                 this::parseFundWallet);
     }
 
-    private String getOperationMethod(String operationType) {
-        return "add" + operationType.substring(0, 1) + operationType.substring(1).toLowerCase();
-    }
-
     private Response<FundWallet> parseFundWallet(byte[] bytes) {
         return parse("fund wallet", bytes, obj -> new FundWallet(obj.getLong("balance")));
     }
 
     private Response<Operation> parseOperation(byte[] bytes) {
         return parse("operation", bytes, obj -> new Operation(
-                obj.getLong("userId"),
+                obj.getString("login"),
                 obj.getLong("amount"),
                 obj.getString("timestamp"),
                 obj.getString("id"),
@@ -109,6 +105,10 @@ public class FabricApi {
         } catch (Exception exception) {
             return Response.BAD(exception.getMessage());
         }
+    }
+
+    private String getOperationMethod(String operationType) {
+        return "add" + operationType.substring(0, 1) + operationType.substring(1).toLowerCase();
     }
 
     interface Transaction {
