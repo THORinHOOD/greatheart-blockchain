@@ -8,10 +8,12 @@ import com.hakaton.blockchain.controllers.models.Operation;
 import com.hakaton.blockchain.security.CustomUserDetails;
 import com.hakaton.blockchain.services.FabricApi;
 import com.hakaton.blockchain.services.TransactionsStoreService;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @RestController
@@ -50,7 +52,8 @@ public class MainController {
 
     @PostMapping("/donation")
     public ResponseEntity<Response<Operation>> addDonation(@RequestBody OperationDto request,
-                                                           @AuthenticationPrincipal Optional<CustomUserDetails> user) {
+                                                           @AuthenticationPrincipal Optional<CustomUserDetails> user,
+                                                           HttpServletRequest req) {
         return Response.EXECUTE(() -> {
             if (user.isEmpty()) {
                 return Response.BAD("Not authorized");
@@ -63,14 +66,15 @@ public class MainController {
             }
 
             return directoryService
-                    .storeTransaction(request.getEntityId(), response.getBody(), user.get().getUsername());
+                    .storeTransaction(request.getEntityId(), response.getBody(), req.getHeader("Authorization"));
         }).makeResponse();
 
     }
 
     @PostMapping("/consumption")
     public ResponseEntity<Response<Operation>> addConsumption(@RequestBody OperationDto request,
-                                                              @AuthenticationPrincipal Optional<CustomUserDetails> user) {
+                                                              @AuthenticationPrincipal Optional<CustomUserDetails> user,
+                                                              HttpServletRequest req) {
         return Response.EXECUTE(() -> {
             if (user.isEmpty()) {
                 return Response.BAD("Not authorized");
@@ -82,7 +86,7 @@ public class MainController {
                 return response;
             }
             return trackerService
-                    .storeTransaction(request.getEntityId(), response.getBody(), user.get().getUsername());
+                    .storeTransaction(request.getEntityId(), response.getBody(), req.getHeader("Authorization"));
         }).makeResponse();
     }
 
